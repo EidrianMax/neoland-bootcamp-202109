@@ -1,24 +1,43 @@
-const { readFile, writeFile } = require('fs')
+const context = require('./context')
 
+/**
+ * TODO doc me
+ * @param {*} name 
+ * @param {*} username 
+ * @param {*} password 
+ * @param {*} callback 
+ */
 function registerUser(name, username, password, callback) {
-    readFile(`${__dirname}/../users.json`, 'utf8', (error, json) => {
-        if (error) return callback(error)
+    if (typeof name !== 'string') throw new TypeError('name is not a string')
+    if (!name.trim().length) throw new Error('name is empty or blank')
+    if (name.trim() !== name) throw new Error('blank spaces around name')
 
-        const users = JSON.parse(json)
+    if (typeof username !== 'string') throw new TypeError('username is not a string')
+    if (!username.trim().length) throw new Error('username is empty or blank')
+    if (/\r?\n|\r|\t| /g.test(username)) throw new Error('username has blank spaces')
+    if (username.length < 4) throw new Error('username has less than 4 characters')
 
-        const user = users.find(user => user.username === username)
+    if (typeof password !== 'string') throw new TypeError('password is not a string')
+    if (!password.trim().length) throw new Error('password is empty or blank')
+    if (/\r?\n|\r|\t| /g.test(password)) throw new Error('password has blank spaces')
+    if (password.length < 8) throw new Error('password has less than 8 characters')
 
-        if (user) return callback(new Error(`user with username ${username} already exists`))
+    if (typeof callback !== 'function') throw new TypeError('callback is not a function')
 
-        users.push({ id: Date.now().toString(36), name, username, password })
+    //const users = this.db.collection('users')
+    const users = context.db.collection('users')
 
-        const json2 = JSON.stringify(users, null, 4)
+    users.insertOne({ name, username, password }, error => {
+        if (error) {
+            if (error.code === 11000)
+                callback(new Error(`user with username ${username} already exists`))
+            else
+                callback(error)
 
-        writeFile(`${__dirname}/../users.json`, json2, error => {
-            if (error) return callback(error)
+            return
+        }
 
-            callback(null)
-        })
+        callback(null)
     })
 }
 

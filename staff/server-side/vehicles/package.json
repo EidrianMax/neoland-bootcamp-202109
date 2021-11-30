@@ -1,0 +1,15 @@
+{
+  "name": "vehicles",
+  "version": "1.0.0",
+  "description": "",
+  "main": "logic",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
+}

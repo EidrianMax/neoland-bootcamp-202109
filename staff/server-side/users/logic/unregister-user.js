@@ -1,7 +1,7 @@
 const { readFile, writeFile } = require('fs')
 
 function unregisterUser(id, password, callback) {
-    readFile('./users.json', 'utf8', (error, json) => {
+    readFile(`${__dirname}/../users.json`, 'utf8', (error, json) => {
         if (error) return callback(error)
 
         const users = JSON.parse(json)
