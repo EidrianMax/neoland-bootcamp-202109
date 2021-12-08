@@ -9,7 +9,9 @@ const { env: { PORT, SECRET }, argv: [, , port = PORT || 8080] } = process
 
 const app = express()
 
-app.post('/api/users', jsonBodyParser, (req, res) => {
+const api = express.Router('/api')
+
+api.post('/users', jsonBodyParser, (req, res) => {
     const { body: { name, username, password } } = req
 
     try {
@@ -23,7 +25,7 @@ app.post('/api/users', jsonBodyParser, (req, res) => {
     }
 })
 
-app.post('/api/users/auth', jsonBodyParser, (req, res) => {
+api.post('/users/auth', jsonBodyParser, (req, res) => {
     const { body: { username, password } } = req
 
     try {
@@ -39,7 +41,7 @@ app.post('/api/users/auth', jsonBodyParser, (req, res) => {
     }
 })
 
-app.get('/api/users', (req, res) => {
+api.get('/users', (req, res) => {
     const { headers: { authorization } } = req
 
     try {
@@ -57,14 +59,14 @@ app.get('/api/users', (req, res) => {
     }
 })
 
-app.patch('/api/users', jsonBodyParser, (req, res) => {
+api.patch('/users', jsonBodyParser, (req, res) => {
     const { headers: { authorization }, body: data } = req
 
     try {
         const [, token] = authorization.split(' ')
         const payload = jwt.verify(token, SECRET)
         const { sub: id } = payload
-        debugger
+
         modifyUser(id, data, error => {
             if (error) {
                 const { message } = error
@@ -87,11 +89,11 @@ app.patch('/api/users', jsonBodyParser, (req, res) => {
     }
 })
 
-// app.get('/unregister', (req, res) => {
+// api.get('/unregister', (req, res) => {
 //     res.send(unregister())
 // })
 
-// app.post('/unregister', formBodyParser, (req, res) => {
+// api.post('/unregister', formBodyParser, (req, res) => {
 //     const { headers: { cookie }, body: { password } } = req
 
 //     const id = getId(cookie)
@@ -109,16 +111,17 @@ app.patch('/api/users', jsonBodyParser, (req, res) => {
 
 // })
 
-// app.get('/exit', (req, res) => {
+// api.get('/exit', (req, res) => {
 //     res.setHeader('Set-Cookie', `user-id=null; Max-Age=0`)
 //     res.redirect('/')
 // })
 
-// app.get('*', (req, res) => {
-//     res.send(fail({ message: `Opps, we can't seem to find the page you're looking for` }))
-// })
+api.all('*', (req, res) => {
+    res.status(404).json({ message: `sorry, this endpoint isn't available` })
+})
+
+app.use('/api', api)
 
 app.listen(port, () => {
     console.log(`Server is ready on localhost port ${port}`)
 })
-

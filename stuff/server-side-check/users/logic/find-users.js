@@ -12,8 +12,10 @@ function findUsers(query, callback) {
 
         if (results.length < 0) return callback(new Error(`user doesn't find`))
 
-        callback(null, results)
+        return callback(null, results)
     })
 }
+
+// No contempla la posibilidad de que el resultado sea un array
 
 module.exports = findUsers

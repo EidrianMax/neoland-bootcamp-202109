@@ -30,6 +30,62 @@ describe('authenticateUser', () => {
         })
     })
 
+    describe('when parametres are incorrect', () => {
+        describe('whem format name is incorrect', () => {
+            it('should fail when username is not a string', () => {
+                expect(() => { authenticateUser(123, '.', () => { }) }).to.throw(TypeError, 'username is not a string')
+                expect(() => { authenticateUser(true, '.', () => { }) }).to.throw(TypeError, 'username is not a string')
+                expect(() => { authenticateUser([], '.', () => { }) }).to.throw(TypeError, 'username is not a string')
+                expect(() => { authenticateUser({}, '.', () => { }) }).to.throw(TypeError, 'username is not a string')
+                expect(() => { authenticateUser(() => { }, '.', () => { }) }).to.throw(TypeError, 'username is not a string')
+            })
+
+            it('should fail when username is empty or blank', () => {
+                expect(() => authenticateUser(' ', '.', () => { })).to.throw(Error, 'username is empty or blank')
+            })
+
+            it('should fail when username has blank spaces around', () => {
+                expect(() => authenticateUser(' ... ', '.', () => { })).to.throw(Error, 'username has blank spaces')
+            })
+
+            it('should fail when username has less than 4 characters', () => {
+                expect(() => authenticateUser('...', '.', () => { })).to.throw(Error, 'has less than 4 characters')
+            })
+        })
+
+        describe('when format password is incorrect', () => {
+            it('should fail when name is not a string', () => {
+                expect(() => authenticateUser('....', 123, () => { })).to.throw(TypeError, 'password is not a string')
+                expect(() => authenticateUser('....', true, () => { })).to.throw(TypeError, 'password is not a string')
+                expect(() => authenticateUser('....', [], () => { })).to.throw(TypeError, 'password is not a string')
+                expect(() => authenticateUser('....', {}, () => { })).to.throw(TypeError, 'password is not a string')
+                expect(() => authenticateUser('....', () => { }, () => { })).to.throw(TypeError, 'password is not a string')
+            })
+
+            it('should fail when password is empty or blank', () => {
+                expect(() => authenticateUser('....', ' ', () => { })).to.throw(Error, 'password is empty or blank')
+            })
+
+            it('should fail when password has blank spaces around', () => {
+                expect(() => authenticateUser('....', ' ... ', () => { })).to.throw(Error, 'password has blank spaces')
+            })
+
+            it('should fail when password has less than 8 characters', () => {
+                expect(() => authenticateUser('....', '.......', () => { })).to.throw(Error, 'password has less than 8 characters')
+            })
+        })
+
+        describe('when format callback is incorrect', () => {
+            it('should fail when callback is not a function', () => {
+                expect(() => authenticateUser('....', '........', 123)).to.throw(TypeError, 'callback is not a function')
+                expect(() => authenticateUser('....', '........', true)).to.throw(TypeError, 'callback is not a function')
+                expect(() => authenticateUser('....', '........', [])).to.throw(TypeError, 'callback is not a function')
+                expect(() => authenticateUser('....', '........', {})).to.throw(TypeError, 'callback is not a function')
+                expect(() => authenticateUser('....', '........', '.')).to.throw(TypeError, 'callback is not a function')
+            })
+        })
+    })
+
     afterEach(done => {
         writeFile('./users.json', '[]', done)
     })
